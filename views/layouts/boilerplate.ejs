@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Wanderlust</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+</head>
+
+<body>
+
+    <%- include("../includes/navbar.ejs") %>
+
+    <!-- ✅ ADD CONTAINER -->
+    <div class="container mt-3">
+
+        <!-- ✅ FLASH MESSAGE HERE -->
+        <%- include("../includes/flash.ejs") %>
+
+        <!-- MAIN BODY -->
+        <%- body %>
+
+        <hr>
+        <a href="/listings">All Listings</a> |
+        <a href="/listings/new">Add New</a>
+
+    </div>
+
+    <%- include("../includes/footer.ejs") %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/script.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.20.0/mapbox-gl.js"></script>
+
+</body>
+
+</html>
