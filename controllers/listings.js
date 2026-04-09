@@ -4,41 +4,40 @@ const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
-module.exports.index = async (req, res) => {
-  const { search = "", category = "" } = req.query;
-  let allListings;
+module.exports.index = async (req, res, next) => {
+  try {
+    const { search = "", category = "" } = req.query;
 
-  function escapeRegex(text) {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    function escapeRegex(text) {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    let filter = {};
+
+    if (search.trim()) {
+      const safeSearch = escapeRegex(search.trim());
+      const regex = new RegExp(safeSearch, "i");
+      filter.$or = [
+        { title: regex },
+        { location: regex },
+        { country: regex },
+        { description: regex },
+      ];
+    }
+
+    if (category.trim() && category !== "All") {
+      filter.category = category.trim();
+    }
+
+    const allListings = await Listing.find(filter);
+    res.render("listings/index", {
+      allListings: allListings || [],
+      selectedCategory: category || "All",
+    });
+  } catch (err) {
+    next(err);
   }
-
-  let filter = {};
-
-  // Search filter
-  if (search.trim()) {
-    const safeSearch = escapeRegex(search.trim());
-    const regex = new RegExp(safeSearch, "i");
-    filter.$or = [
-      { title: regex },
-      { location: regex },
-      { country: regex },
-      { description: regex },
-    ];
-  }
-
-  // Category filter
-  if (category.trim() && category !== "All") {
-    filter.category = category.trim();
-  }
-
-  allListings = await Listing.find(filter);
-
-  res.render("listings/index", {
-    allListings,
-    selectedCategory: category || "All",
-  });
 };
-
 module.exports.renderNewForm = (req, res) => {
   res.render("listings/new");
 };
