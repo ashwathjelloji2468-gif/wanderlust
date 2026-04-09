@@ -13,7 +13,7 @@ router
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
-    upload.single("image"),
+    upload.single("listing[image]"),
     wrapAsync(listingController.createListing),
   );
 
