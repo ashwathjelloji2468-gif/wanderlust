@@ -8,27 +8,42 @@ const wrapAsync = require("../utils/wrapAsync");
 const listingController = require("../controllers/listings");
 const { isLoggedIn } = require("../middleware");
 
+// INDEX & CREATE
 router
   .route("/")
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
-    upload.single("listing[image]"),
-    wrapAsync(listingController.createListing),
+    upload.single("listing[image]"),   // ✅ FIXED
+    wrapAsync(listingController.createListing)
   );
 
+// NEW FORM
 router.get("/new", isLoggedIn, listingController.renderNewForm);
 
+// SHOW
 router.get("/:id", wrapAsync(listingController.showListing));
 
+// EDIT FORM
 router.get(
   "/:id/edit",
   isLoggedIn,
-  wrapAsync(listingController.renderEditForm),
+  wrapAsync(listingController.renderEditForm)
 );
 
-router.put("/:id", isLoggedIn, upload.single("image"), wrapAsync(listingController.updateListing));
+// UPDATE
+router.put(
+  "/:id",
+  isLoggedIn,
+  upload.single("listing[image]"),   // ✅ FIXED HERE ALSO
+  wrapAsync(listingController.updateListing)
+);
 
-router.delete("/:id", isLoggedIn, wrapAsync(listingController.destroyListing));
+// DELETE
+router.delete(
+  "/:id",
+  isLoggedIn,
+  wrapAsync(listingController.destroyListing)
+);
 
 module.exports = router;
