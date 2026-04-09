@@ -57,7 +57,6 @@
                             </div>
                         </div>
                     </div>
-                    </div>
 
                     <% if (!allListings || allListings.length===0) { %>
                         <div class="text-center py-5">
@@ -69,12 +68,12 @@
                                 <% for (let listing of allListings) { %>
                                     <div class="col listing-card" data-category="<%= listing.category || 'All' %>">
                                         <div class="card h-100 shadow-sm">
-                                            <img src="<%= listing.image?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop' %>"
-                                                class="card-img-top" alt="<%= listing.title %>">
+                                            <img src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop' %>"
+                                                class="card-img-top" alt="<%= listing.title || 'Listing image' %>">
 
                                             <div class="card-body d-flex flex-column">
                                                 <h5 class="card-title mb-2">
-                                                    <%= listing.title %>
+                                                    <%= listing.title || 'Untitled Listing' %>
                                                 </h5>
 
                                                 <p class="card-text flex-grow-1">
@@ -84,15 +83,18 @@
 
                                                 <p class="mb-2 text-muted">
                                                     <i class="fa-solid fa-location-dot me-1"></i>
-                                                    <%= listing.location %>, <%= listing.country %>
+                                                    <%= listing.location || 'Unknown location' %>, <%= listing.country
+                                                            || 'Unknown country' %>
                                                 </p>
 
                                                 <p class="mb-1 fw-semibold listing-price">
                                                     ₹<span class="base-price">
-                                                        <%= listing.price.toLocaleString("en-IN") %>
+                                                        <%= listing.price ? listing.price.toLocaleString("en-IN") : '0'
+                                                            %>
                                                     </span>
                                                     <span class="price-with-tax d-none">
-                                                        <%= Math.round(listing.price * 1.18).toLocaleString("en-IN") %>
+                                                        <%= listing.price ? Math.round(listing.price *
+                                                            1.18).toLocaleString("en-IN") : '0' %>
                                                     </span>
                                                     / night
                                                 </p>
