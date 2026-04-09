@@ -57,29 +57,34 @@ module.exports.showListing = async (req, res) => {
   });
 };
 
-module.exports.createListing = async (req, res) => {
-  const geoResponse = await geocodingClient
-    .forwardGeocode({
-      query: req.body.listing.location,
-      limit: 1,
-    })
-    .send();
+module.exports.createListing = async (req, res, next) => {
+  try {
+    const geoResponse = await geocodingClient
+      .forwardGeocode({
+        query: req.body.listing.location,
+        limit: 1,
+      })
+      .send();
 
-  const newListing = new Listing(req.body.listing);
+    const newListing = new Listing(req.body.listing);
+    newListing.owner = req.user._id;
+    newListing.geometry = geoResponse.body.features[0].geometry;
 
-  newListing.owner = req.user._id;
-  newListing.geometry = geoResponse.body.features[0].geometry;
+    if (req.file) {
+      newListing.image = {
+        url: req.file.path,
+        filename: req.file.filename,
+      };
+    } else {
+      throw new Error("No image uploaded");
+    }
 
-  if (req.file) {
-    newListing.image = {
-      url: req.file.path,
-      filename: req.file.filename,
-    };
+    await newListing.save();
+    req.flash("success", "New Listing Created!");
+    res.redirect(`/listings/${newListing._id}`);
+  } catch (err) {
+    next(err);
   }
-
-  await newListing.save();
-  req.flash("success", "New Listing Created!");
-  res.redirect(`/listings/${newListing._id}`);
 };
 
 module.exports.renderEditForm = async (req, res) => {
@@ -93,27 +98,35 @@ module.exports.renderEditForm = async (req, res) => {
   res.render("listings/edit", { listing });
 };
 
-module.exports.updateListing = async (req, res) => {
-  const listing = await Listing.findByIdAndUpdate(
-    req.params.id,
-    req.body.listing,
-    { new: true },
-  );
+module.exports.updateListing = async (req, res, next) => {
+  try {
+    const listing = await Listing.findByIdAndUpdate(
+      req.params.id,
+      req.body.listing,
+      { new: true }
+    );
 
-  if (req.file) {
-    listing.image = {
-      url: req.file.path,
-      filename: req.file.filename,
-    };
-    await listing.save();
+    if (req.file) {
+      listing.image = {
+        url: req.file.path,
+        filename: req.file.filename,
+      };
+      await listing.save();
+    }
+
+    req.flash("success", "Listing Updated!");
+    res.redirect(`/listings/${listing._id}`);
+  } catch (err) {
+    next(err);
   }
-
-  req.flash("success", "Listing Updated!");
-  res.redirect(`/listings/${listing._id}`);
 };
 
-module.exports.destroyListing = async (req, res) => {
-  await Listing.findByIdAndDelete(req.params.id);
-  req.flash("success", "Listing Deleted!");
-  res.redirect("/listings");
+module.exports.destroyListing = async (req, res, next) => {
+  try {
+    await Listing.findByIdAndDelete(req.params.id);
+    req.flash("success", "Listing Deleted!");
+    res.redirect("/listings");
+  } catch (err) {
+    next(err);
+  }
 };
