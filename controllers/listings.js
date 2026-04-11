@@ -38,6 +38,7 @@ module.exports.index = async (req, res, next) => {
     next(err);
   }
 };
+
 module.exports.renderNewForm = (req, res) => {
   res.render("listings/new");
 };
@@ -64,6 +65,8 @@ module.exports.createListing = async (req, res, next) => {
         limit: 1,
       })
       .send();
+
+    req.body.listing.category = req.body.listing.category.trim();
 
     const newListing = new Listing(req.body.listing);
     newListing.owner = req.user._id;
