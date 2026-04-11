@@ -5,7 +5,7 @@
 
         <form method="POST" action="/listings" class="row g-3 needs-validation" enctype="multipart/form-data"
             novalidate>
-            <!-- Title -->
+
             <div class="col-md-6">
                 <label for="title" class="form-label">Title</label>
                 <input name="listing[title]" id="title" placeholder="Enter title" type="text" class="form-control"
@@ -13,7 +13,6 @@
                 <div class="valid-feedback">Title looks good!</div>
             </div>
 
-            <!-- Category -->
             <div class="col-md-6">
                 <label for="category" class="form-label">Category</label>
                 <select name="listing[category]" id="category" class="form-select" required>
@@ -25,7 +24,6 @@
                 <div class="invalid-feedback">Please select a category.</div>
             </div>
 
-            <!-- Description -->
             <div class="col-12">
                 <label for="description" class="form-label">Description</label>
                 <textarea name="listing[description]" id="description" placeholder="Enter description"
@@ -33,14 +31,12 @@
                 <div class="invalid-feedback">Please enter a short description.</div>
             </div>
 
-            <!-- Image -->
             <div class="col-md-6">
                 <label for="image" class="form-label">Upload Listing Image</label>
-                <input name="listing[image]" id="image" type="file" class="form-control" accept="image/*" required />
+                <input name="image" id="image" type="file" class="form-control" accept="image/*" required />
                 <div class="invalid-feedback">Please upload an image.</div>
             </div>
 
-            <!-- Price -->
             <div class="col-md-6">
                 <label for="price" class="form-label">Price</label>
                 <input name="listing[price]" id="price" placeholder="1000" type="number" class="form-control" min="1"
@@ -48,7 +44,6 @@
                 <div class="invalid-feedback">Price should be valid.</div>
             </div>
 
-            <!-- Country -->
             <div class="col-md-6">
                 <label for="country" class="form-label">Country</label>
                 <input name="listing[country]" id="country" placeholder="India" type="text" class="form-control"
@@ -56,7 +51,6 @@
                 <div class="invalid-feedback">Country name should be valid.</div>
             </div>
 
-            <!-- Location -->
             <div class="col-md-6">
                 <label for="location" class="form-label">Location</label>
                 <input name="listing[location]" id="location" placeholder="Goa" type="text" class="form-control"
@@ -64,7 +58,6 @@
                 <div class="invalid-feedback">Location should be valid.</div>
             </div>
 
-            <!-- Submit -->
             <div class="col-12">
                 <button class="btn btn-primary btn-lg">Add Listing</button>
             </div>

@@ -116,6 +116,22 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 8080;
 
+// Add BEFORE app.listen()
+app.use((err, req, res, next) => {
+  console.log('ERROR:', err.message);
+  req.flash('error', err.message || 'Server error');
+  res.redirect('/listings');
+});
+
+app.use((err, req, res, next) => {
+  console.error("FULL ERROR:", err);
+  console.error("ERROR MESSAGE:", err.message);
+  console.error("STACK:", err.stack);
+
+  res.status(err.status || 500);
+  res.render("error.ejs", { err });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
