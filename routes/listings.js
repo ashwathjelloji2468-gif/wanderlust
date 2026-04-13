@@ -13,7 +13,7 @@ router
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
-    upload.single("image"),  // ✅ CHANGED
+    upload.single("image"),
     wrapAsync(listingController.createListing)
   );
 
@@ -30,7 +30,7 @@ router.get(
 router.put(
   "/:id",
   isLoggedIn,
-  upload.single("image"),  // ✅ CHANGED
+  upload.single("image"),
   wrapAsync(listingController.updateListing)
 );
 

@@ -1,7 +1,6 @@
-if (process.env.NODE_ENV != "production") {
+if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
-require("dotenv").config({ path: "./.env" });
 
 console.log("ATLASDB_URL =", process.env.ATLASDB_URL);
 
@@ -28,7 +27,7 @@ const dbUrl = process.env.ATLASDB_URL;
 
 async function main() {
   try {
-    await mongoose.connect(process.env.ATLASDB_URL);
+    await mongoose.connect(dbUrl);
     console.log("Connected to MongoDB");
   } catch (err) {
     console.error("MongoDB connection error:", err);
@@ -50,7 +49,7 @@ const sessionOptions = {
   },
 };
 
-// EJS Engine
+// View engine
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -62,16 +61,17 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Session & Auth
+// Session and auth
 app.use(session(sessionOptions));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Flash middleware
+// Locals middleware
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
@@ -80,58 +80,69 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// Home route
 app.get(
   "/",
   wrapAsync(async (req, res) => {
     res.render("home");
-  }),
+  })
 );
 
+// Debug test route
+app.get("/test-error", (req, res) => {
+  throw new Error("Test error is working");
+});
+
+// Routes
 app.use("/listings", listingsRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", userRouter);
 
-// Error handlers
+// 404 handler
 app.use((req, res, next) => {
+  console.log("404 - Page not found:", req.method, req.originalUrl);
   next(new ExpressError(404, "Page Not Found!"));
 });
 
+// Global error handler
 app.use((err, req, res, next) => {
-  let { statusCode = 500, message = "Something Went Wrong" } = err;
+  console.error("==============================================");
+  console.error("ERROR TIME:", new Date().toISOString());
+  console.error("ERROR ROUTE:", req.method, req.originalUrl);
+  console.error("ERROR MESSAGE:", err.message);
+  console.error("ERROR NAME:", err.name);
+  console.error("ERROR CODE:", err.code);
+  console.error("ERROR STATUS:", err.status || err.statusCode);
+  console.error("REQ.BODY:", req.body);
+  console.error("REQ.FILE:", req.file);
+  console.error("REQ.USER:", req.user);
+  console.error("MAP_TOKEN EXISTS:", !!process.env.MAP_TOKEN);
+  console.error("FULL STACK TRACE:");
+  console.error(err.stack);
+  console.error("==============================================");
+
+  let statusCode = err.statusCode || err.status || 500;
+  let message = err.message || "Something Went Wrong";
 
   if (err.name === "ValidationError") {
     message = Object.values(err.errors)
       .map((e) => e.message)
       .join(", ");
+    statusCode = 400;
   } else if (err.name === "CastError") {
     message = "Invalid ID!";
     statusCode = 400;
   }
 
-  console.error("Error:", err);
-  res.status(statusCode).render("error", { err, message });
+  res.status(statusCode).render("error", {
+    err,
+    message,
+    statusCode,
+  });
 });
 
 // Start server
 const PORT = process.env.PORT || 8080;
-
-// Add BEFORE app.listen()
-app.use((err, req, res, next) => {
-  console.log('ERROR:', err.message);
-  req.flash('error', err.message || 'Server error');
-  res.redirect('/listings');
-});
-
-app.use((err, req, res, next) => {
-  console.error("FULL ERROR:", err);
-  console.error("ERROR MESSAGE:", err.message);
-  console.error("STACK:", err.stack);
-
-  res.status(err.status || 500);
-  res.render("error.ejs", { err });
-});
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

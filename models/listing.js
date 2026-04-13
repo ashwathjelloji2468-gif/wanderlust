@@ -6,20 +6,47 @@ const listingSchema = new Schema({
     type: String,
     required: true,
   },
-  description: String,
-  image: {
-    url: String,
-    filename: String,
+  description: {
+    type: String,
+    required: true,
   },
-  price: Number,
-  location: String,
-  country: String,
+  price: {
+    type: Number,
+    required: true,
+  },
+  location: {
+    type: String,
+    required: true,
+  },
+  country: {
+    type: String,
+    required: true,
+  },
+  category: {
+    type: String,
+    default: "Cabins",
+  },
+  image: {
+    url: {
+      type: String,
+      default: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800",
+    },
+    filename: {
+      type: String,
+      default: "defaultimage",
+    },
+  },
   geometry: {
     type: {
       type: String,
       enum: ["Point"],
+      default: "Point",
     },
-    coordinates: [Number],
+    coordinates: {
+      type: [Number],
+      default: [78.4867, 17.3850],
+      required: true,
+    },
   },
   reviews: [
     {
@@ -31,13 +58,6 @@ const listingSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
-  category: {
-    type: String,
-    enum: ["Cabins", "Beach", "Luxury"],
-    default: "Cabins",
-  },
 });
 
-const Listing = mongoose.model("Listing", listingSchema);
-
-module.exports = Listing;
+module.exports = mongoose.model("Listing", listingSchema);

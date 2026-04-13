@@ -29,8 +29,9 @@
 
       stars.forEach((star) => {
         star.addEventListener("click", () => {
-          ratingInput.value = star.dataset.value;
-          paintStars(Number(star.dataset.value));
+          const value = Number(star.dataset.value);
+          ratingInput.value = value;
+          paintStars(value);
         });
 
         star.addEventListener("mouseover", () => {
@@ -48,11 +49,13 @@
       marker.className = "custom-marker";
 
       marker.innerHTML = `
-        <div class="marker-pin">
-          <div class="marker-inner">
-            <svg viewBox="0 0 24 24" class="marker-icon" aria-hidden="true">
-              <path d="M12 2L4 8v10h5v-5h6v5h5V8L12 2z"></path>
-            </svg>
+        <div class="marker-float">
+          <div class="marker-pin">
+            <div class="marker-inner">
+              <svg viewBox="0 0 24 24" class="marker-icon" aria-hidden="true">
+                <path d="M12 2L4 8v10h5v-5h6v5h5V8L12 2z"></path>
+              </svg>
+            </div>
           </div>
         </div>
       `;
@@ -62,12 +65,23 @@
 
     const mapEl = document.getElementById("map");
 
-    if (mapEl && mapEl.dataset.token) {
-      mapboxgl.accessToken = mapEl.dataset.token;
+    if (mapEl && typeof mapboxgl !== "undefined") {
+      const token = mapEl.dataset.token ? mapEl.dataset.token.trim() : "";
+      const title = mapEl.dataset.title || "Listing";
+      const location = mapEl.dataset.location || "";
+      const country = mapEl.dataset.country || "";
 
-      const coords = JSON.parse(mapEl.dataset.coords || "[]");
+      let coords = null;
 
-      if (Array.isArray(coords) && coords.length === 2) {
+      try {
+        coords = JSON.parse(mapEl.dataset.coords || "null");
+      } catch (err) {
+        console.error("Invalid map coordinates:", err);
+      }
+
+      if (token && Array.isArray(coords) && coords.length === 2) {
+        mapboxgl.accessToken = token;
+
         const map = new mapboxgl.Map({
           container: "map",
           style: "mapbox://styles/mapbox/streets-v12",
@@ -75,18 +89,28 @@
           zoom: 10,
         });
 
+        map.addControl(new mapboxgl.NavigationControl());
+
         const customMarker = createUniqueMarker();
 
-        new mapboxgl.Marker({ element: customMarker, anchor: "bottom" })
+        new mapboxgl.Marker({
+          element: customMarker,
+          anchor: "bottom",
+        })
           .setLngLat(coords)
           .setPopup(
-            new mapboxgl.Popup({ offset: 30 }).setHTML(
-              `<h6>${mapEl.dataset.title}</h6><p>${mapEl.dataset.location}, ${mapEl.dataset.country}</p>`,
-            ),
+            new mapboxgl.Popup({ offset: 30 }).setHTML(`
+              <h6>${title}</h6>
+              <p>${location}, ${country}</p>
+            `)
           )
           .addTo(map);
 
-        map.addControl(new mapboxgl.NavigationControl());
+        map.on("load", () => {
+          map.resize();
+        });
+      } else {
+        console.warn("Map not initialized: missing token or invalid coordinates");
       }
     }
 

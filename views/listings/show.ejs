@@ -135,7 +135,7 @@
                         <div class="mt-5">
                             <h4 class="fw-bold mb-3">Where you’ll be</h4>
 
-                            <% if (coords) { %>
+                            <% if (coords && mapToken) { %>
                                 <div id="map" data-coords='<%- JSON.stringify(coords) %>'
                                     data-title="<%= listing.title %>" data-location="<%= listing.location %>"
                                     data-country="<%= listing.country %>" data-token="<%= mapToken %>">

@@ -5,12 +5,12 @@
 
         <form method="POST" action="/listings" class="row g-3 needs-validation" enctype="multipart/form-data"
             novalidate>
-
             <div class="col-md-6">
                 <label for="title" class="form-label">Title</label>
                 <input name="listing[title]" id="title" placeholder="Enter title" type="text" class="form-control"
                     required />
                 <div class="valid-feedback">Title looks good!</div>
+                <div class="invalid-feedback">Please enter a title.</div>
             </div>
 
             <div class="col-md-6">
@@ -59,7 +59,7 @@
             </div>
 
             <div class="col-12">
-                <button class="btn btn-primary btn-lg">Add Listing</button>
+                <button type="submit" class="btn btn-primary btn-lg">Add Listing</button>
             </div>
         </form>
     </div>
